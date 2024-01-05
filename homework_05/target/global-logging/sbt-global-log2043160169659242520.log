@@ -1,0 +1,84 @@
+[debug] > Exec(early(addDefaultCommands), None, None)
+[debug] > Exec(addDefaultCommands, None, None)
+[debug] > Exec(early(initialize), None, None)
+[debug] > Exec(initialize, None, None)
+[debug] > Exec(boot, None, None)
+[debug] > Exec(writeSbtVersion, None, None)
+[debug] > Exec(reload, None, None)
+[debug] > Exec(sbtStashOnFailure, None, None)
+[debug] > Exec(onFailure loadFailed, None, None)
+[debug] > Exec(loadp, None, None)
+[info] welcome to sbt 1.7.2 (Oracle Corporation Java 18.0.1.1)
+[debug]       Load.loadUnit: plugins took 178.5262ms
+[debug]       Load.loadUnit: defsScala took 0.474ms
+[debug] [Loading] Scanning directory C:\Users\Win10\.sbt\1.0\plugins
+[debug] [Loading] Found non-root projects 
+[debug] [Loading] Done in C:\Users\Win10\.sbt\1.0\plugins, returning: ()
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)
+[debug] Plugins.deducer#function took 36.3921 ms
+[debug]           Load.resolveProject(global-plugins) took 84.3238ms
+[debug]         Load.loadTransitive: finalizeProject(Project(id global-plugins, base: C:\Users\Win10\.sbt\1.0\plugins, plugins: List(<none>))) took 157.5092ms
+[debug] [Loading] Done in C:\Users\Win10\.sbt\1.0\plugins, returning: (global-plugins)
+[debug]       Load.loadUnit: loadedProjectsRaw took 199.7897ms
+[debug]       Load.loadUnit: cleanEvalClasses took 0.6281ms
+[debug]     Load.loadUnit(file:/C:/Users/Win10/.sbt/1.0/plugins/, ...) took 396.4855ms
+[debug]   Load.apply: load took 758.3892ms
+[debug]   Load.apply: resolveProjects took 13.1147ms
+[debug]   Load.apply: finalTransforms took 115.3868ms
+[debug]   Load.apply: config.delegates took 12.3233ms
+[debug]   Load.apply: Def.make(settings)... took 614.6876ms
+[debug]   Load.apply: structureIndex took 164.5787ms
+[debug]   Load.apply: mkStreams took 1.8014ms
+[info] loading global plugins from C:\Users\Win10\.sbt\1.0\plugins
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[debug] Load.defaultLoad until apply took 3519.929ms
+[debug]           Load.loadUnit: plugins took 38.0795ms
+[debug]           Load.loadUnit: defsScala took 0.0097ms
+[debug] [Loading] Scanning directory E:\otus\kafka-mooc-2023-04\project
+[debug] [Loading] Found non-root projects 
+[debug] [Loading] Done in E:\otus\kafka-mooc-2023-04\project, returning: ()
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)
+[debug] Plugins.deducer#function took 4.9935 ms
+[debug]               Load.resolveProject(kafka-mooc-2023-04-build) took 1.7884ms
+[debug]             Load.loadTransitive: finalizeProject(Project(id kafka-mooc-2023-04-build, base: E:\otus\kafka-mooc-2023-04\project, plugins: List(<none>))) took 7.7544ms
+[debug] [Loading] Done in E:\otus\kafka-mooc-2023-04\project, returning: (kafka-mooc-2023-04-build)
+[debug]           Load.loadUnit: loadedProjectsRaw took 10.7122ms
+[debug]           Load.loadUnit: cleanEvalClasses took 0.0211ms
+[debug]         Load.loadUnit(file:/E:/otus/kafka-mooc-2023-04/project/, ...) took 53.368ms
+[debug]       Load.apply: load took 56.3424ms
+[debug]       Load.apply: resolveProjects took 0.1997ms
+[debug]       Load.apply: finalTransforms took 17.3719ms
+[debug]       Load.apply: config.delegates took 0.6481ms
+[debug]       Load.apply: Def.make(settings)... took 124.3063ms
+[debug]       Load.apply: structureIndex took 48.3056ms
+[debug]       Load.apply: mkStreams took 0.0031ms
+[info] loading project definition from E:\otus\kafka-mooc-2023-04\project
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[debug]     Load.loadUnit: plugins took 538.4073ms
+[debug]     Load.loadUnit: defsScala took 0.0036ms
+[debug] [Loading] Scanning directory E:\otus\kafka-mooc-2023-04
+[debug]       Load.loadUnit: mkEval took 7.7419ms
