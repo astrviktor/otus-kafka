@@ -72,9 +72,22 @@ func (h *Handler) CreateJob(ctx *fasthttp.RequestCtx) {
 		h.log.Error("fail to write data to kafka", zap.Error(err))
 		ctx.Error("fail to write data to kafka", http.StatusInternalServerError)
 		return
-	} else {
-		ctx.Success("application/json", nil)
 	}
+
+	jobResponse := JobResponse{
+		Id:       job.Id,
+		Sleep:    job.Sleep,
+		DataSize: len(job.Data),
+	}
+
+	body, err := json.Marshal(jobResponse)
+	if err != nil {
+		h.log.Error("fail to marshal data", zap.Error(err))
+		ctx.Error("fail to marshal data", http.StatusInternalServerError)
+		return
+	}
+
+	ctx.Success("application/json", body)
 }
 
 func (h *Handler) Run() {

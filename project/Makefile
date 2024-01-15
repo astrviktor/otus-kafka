@@ -3,3 +3,9 @@ compose-up:
 
 compose-down:
 	docker-compose -f build/docker-compose.yml down
+
+docker-build-receiver:
+	docker build \
+		--platform linux/amd64 \
+		-t "astrviktor/receiver:1.0.0" \
+		-f ./build/receiver/Dockerfile .
