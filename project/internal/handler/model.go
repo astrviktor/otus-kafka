@@ -11,3 +11,8 @@ type JobResponse struct {
 	Sleep    int64  `json:"sleep"`
 	DataSize int    `json:"data_size"`
 }
+
+type JobDone struct {
+	Id     string `json:"id"`
+	Status string `json:"status"`
+}

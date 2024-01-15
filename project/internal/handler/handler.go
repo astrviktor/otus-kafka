@@ -30,7 +30,7 @@ func NewHandler(log *zap.Logger, cfg *config.Config) (*Handler, error) {
 	}
 
 	h := &Handler{
-		log: log,
+		log: log.Named("handler"),
 		cfg: cfg,
 
 		producer: producer,
@@ -61,9 +61,9 @@ func (h *Handler) CreateJob(ctx *fasthttp.RequestCtx) {
 	}
 
 	err = h.producer.Produce(&kafka.Message{
-		Key: []byte(uuid.New().String()),
+		Key: []byte(job.Id),
 		TopicPartition: kafka.TopicPartition{
-			Topic:     &h.cfg.Kafka.Producer.Topic,
+			Topic:     &h.cfg.Kafka.ReceiverProducer.Topic,
 			Partition: kafka.PartitionAny},
 		Value: value,
 	}, nil)

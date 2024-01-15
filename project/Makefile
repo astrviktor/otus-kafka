@@ -9,3 +9,12 @@ docker-build-receiver:
 		--platform linux/amd64 \
 		-t "astrviktor/receiver:1.0.0" \
 		-f ./build/receiver/Dockerfile .
+
+docker-build-processor:
+	docker build \
+		--platform linux/amd64 \
+		-t "astrviktor/processor:1.0.0" \
+		-f ./build/processor/Dockerfile .
+
+yandex-tank:
+	docker exec -it yandex-tank /bin/bash

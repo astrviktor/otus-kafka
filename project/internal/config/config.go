@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/kelseyhightower/envconfig"
+	"time"
 )
 
 const ReceiverPrefix = "receiver"
@@ -36,15 +37,20 @@ type LoggerConfig struct {
 }
 
 type KafkaConfig struct {
-	BootstrapServers string `default:"localhost:9092"`
+	BootstrapServers string `default:"localhost:9091"`
 
-	Producer struct {
-		Topic string `default:"kafka-topic"`
+	ReceiverProducer struct {
+		Topic string `default:"receiver-topic"`
 	}
 
-	Consumer struct {
-		GroupID string `default:"processor"`
-		Topic   string `default:"kafka-topic"`
+	ProcessorConsumer struct {
+		GroupID     string        `default:"processor"`
+		Topic       string        `default:"receiver-topic"`
+		ReadTimeout time.Duration `default:"10s"`
+	}
+
+	ProcessorProducer struct {
+		Topic string `default:"processor-topic"`
 	}
 }
 

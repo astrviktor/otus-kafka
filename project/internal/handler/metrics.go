@@ -5,7 +5,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func (h *Handler) Metrics() fasthttp.RequestHandler {
+func Metrics() fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		metrics.WritePrometheus(ctx.Response.BodyWriter(), true)
 	}

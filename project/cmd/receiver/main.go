@@ -46,7 +46,7 @@ func main() {
 
 	r := router.New()
 	r.POST("/api/v1/create/job", h.Middleware(h.CreateJob))
-	r.GET("/metrics", h.Metrics())
+	r.GET("/metrics", handler.Metrics())
 
 	server := fasthttp.Server{
 		Handler:            r.Handler,
