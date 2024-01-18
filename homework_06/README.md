@@ -22,18 +22,7 @@ curl http://localhost:8083/connector-plugins | jq
 docker exec kafka1 kafka-topics --list --bootstrap-server kafka1:19092,kafka2:19093,kafka3:19094
 ```
 
-5) Создаем таблицу в PostgreSQL и пишем в неё данные
-```
-docker exec -ti postgres psql -U postgres
-CREATE TABLE customers (id INT PRIMARY KEY, name TEXT, age INT);
-INSERT INTO customers (id, name, age) VALUES (5, 'Fred', 34);
-INSERT INTO customers (id, name, age) VALUES (7, 'Sue', 25);
-INSERT INTO customers (id, name, age) VALUES (2, 'Bill', 51);
-SELECT * FROM customers;
-\q
-```
-
-5) Подключаемся к базе и загружаем данные
+5) Создаем таблицу в PostgreSQL и загружаем данные
 ```
 docker exec -ti postgres psql -U postgres
 CREATE TABLE customers (id int PRIMARY KEY, first_name text, last_name text, gender text, card_number text, bill numeric(7,2), created_date timestamp, modified_date timestamp);
