@@ -59,3 +59,7 @@ docker-compose stop
 docker container prune -f
 docker volume prune -f
 ```
+
+Скриншот выполнения:
+
+![Alt text](./kafka-connect.jpg?raw=true "")
