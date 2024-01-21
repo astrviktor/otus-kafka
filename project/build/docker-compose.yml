@@ -64,8 +64,39 @@ services:
 
       # create init topics
       kafka-topics --create --topic receiver-topic --partitions 8 --bootstrap-server kafka:9191
-      kafka-topics --create --topic processor-topic --partitions 1 --bootstrap-server kafka:9191 
+      kafka-topics --create --topic processor-topic --partitions 1 --bootstrap-server kafka:9191
+      kafka-topics --create --topic postgres-topic --partitions 1 --bootstrap-server kafka:9191
+      kafka-topics --create --topic clickhouse-topic --partitions 1 --bootstrap-server kafka:9191
       "
+
+  connect:
+    image: confluentinc/cp-kafka-connect:7.0.9
+    container_name: connect
+    hostname: connect
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8085:8085"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "kafka:9191"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      CONNECT_REST_PORT: "8085"
+      CONNECT_GROUP_ID: "local-connect"
+      CONNECT_CONFIG_STORAGE_TOPIC: "local-connect-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "local-connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "local-connect-status"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_PLUGIN_PATH: /usr/share/java/,/etc/kafka-connect/jars
+    volumes:
+      - ./connect:/etc/kafka-connect/jars
 
   kafka-exporter:
     image: bitnami/kafka-exporter:1.7.0
@@ -78,7 +109,6 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-
 
   kafdrop:
     image: obsidiandynamics/kafdrop
@@ -163,6 +193,29 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+
+  converter:
+    image: astrviktor/converter:1.0.0
+    container_name: converter
+    hostname: converter
+    ports:
+      - "8083:8083"
+    environment:
+      CONVERTER_KAFKA_BOOTSTRAPSERVERS: "kafka:9191"
+      CONVERTER_PROCESSOR_HOST: "0.0.0.0"
+      CONVERTER_PROCESSOR_PORT: "8083"
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16.1
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
 
   yandex-tank:
     build: ./yandex-tank

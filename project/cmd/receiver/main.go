@@ -8,8 +8,9 @@ import (
 	"os"
 	"os/signal"
 	"project/internal/config"
-	"project/internal/handler"
 	"project/internal/logger"
+	"project/internal/metrics"
+	"project/internal/receiver"
 	"syscall"
 )
 
@@ -36,7 +37,7 @@ func main() {
 		os.Exit(1)
 	}()
 
-	h, err := handler.NewHandler(log, cfg)
+	h, err := receiver.NewHandler(log, cfg)
 	if err != nil {
 		log.Error("fail to create handler", zap.Error(err))
 		os.Exit(1)
@@ -46,7 +47,7 @@ func main() {
 
 	r := router.New()
 	r.POST("/api/v1/create/job", h.Middleware(h.CreateJob))
-	r.GET("/metrics", handler.Metrics())
+	r.GET("/metrics", metrics.Metrics())
 
 	server := fasthttp.Server{
 		Handler:            r.Handler,

@@ -8,9 +8,9 @@ import (
 	"os"
 	"os/signal"
 	"project/internal/config"
-	"project/internal/handler"
 	"project/internal/logger"
-	"project/internal/worker"
+	"project/internal/metrics"
+	"project/internal/processor"
 	"syscall"
 )
 
@@ -25,6 +25,7 @@ func main() {
 		fmt.Println("fail to create logger")
 		os.Exit(1)
 	}
+	log = log.Named(config.ProcessorPrefix)
 
 	cfg, err := config.ReadConfig(config.ProcessorPrefix)
 	if err != nil {
@@ -37,7 +38,7 @@ func main() {
 		os.Exit(1)
 	}()
 
-	w, err := worker.NewWorker(log, cfg)
+	w, err := processor.NewWorker(log, cfg)
 	if err != nil {
 		log.Error("fail to create worker", zap.Error(err))
 		os.Exit(1)
@@ -46,7 +47,7 @@ func main() {
 	w.Run()
 
 	r := router.New()
-	r.GET("/metrics", handler.Metrics())
+	r.GET("/metrics", metrics.Metrics())
 
 	server := fasthttp.Server{
 		Handler: r.Handler,

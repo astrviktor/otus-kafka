@@ -8,10 +8,12 @@ import (
 
 const ReceiverPrefix = "receiver"
 const ProcessorPrefix = "processor"
+const ConverterPrefix = "converter"
 
 type Config struct {
 	Receiver  ReceiverConfig
 	Processor ProcessorConfig
+	Converter ConverterConfig
 	Logger    LoggerConfig
 	Kafka     KafkaConfig
 }
@@ -29,6 +31,11 @@ type ReceiverConfig struct {
 type ProcessorConfig struct {
 	Host string `default:"127.0.0.1"`
 	Port string `default:"8082"`
+}
+
+type ConverterConfig struct {
+	Host string `default:"127.0.0.1"`
+	Port string `default:"8083"`
 }
 
 type LoggerConfig struct {
@@ -51,6 +58,20 @@ type KafkaConfig struct {
 
 	ProcessorProducer struct {
 		Topic string `default:"processor-topic"`
+	}
+
+	ConverterConsumer struct {
+		GroupID     string        `default:"converter"`
+		Topic       string        `default:"processor-topic"`
+		ReadTimeout time.Duration `default:"10s"`
+	}
+
+	ConverterPostgresProducer struct {
+		Topic string `default:"postgres-topic"`
+	}
+
+	ConverterClickhouseProducer struct {
+		Topic string `default:"clickhouse-topic"`
 	}
 }
 
