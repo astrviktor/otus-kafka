@@ -22,5 +22,11 @@ docker-build-converter:
 		-t "astrviktor/converter:1.0.0" \
 		-f ./build/converter/Dockerfile .
 
+docker-build-informer:
+	docker build --no-cache \
+		--platform linux/amd64 \
+		-t "astrviktor/informer:1.0.0" \
+		-f ./build/informer/Dockerfile .
+
 yandex-tank:
 	docker exec -it yandex-tank /bin/bash

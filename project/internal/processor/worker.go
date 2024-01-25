@@ -133,9 +133,9 @@ func (w *Worker) processing() (string, string) {
 
 	jobDone := model.JobDone{
 		Id:         job.Id,
-		Status:     "done",
-		DateCreate: job.DateCreate,
-		DateDone:   time.Now(),
+		Status:     model.JobStatusFinish,
+		CreateDate: job.CreateDate,
+		FinishDate: time.Now(),
 	}
 
 	value, err := json.Marshal(jobDone)

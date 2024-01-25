@@ -43,7 +43,7 @@ services:
       KAFKA_JMX_HOSTNAME: kafka
       EXTRA_ARGS: "-javaagent:/opt/kafka/jmx_javaagent/jmx_prometheus_javaagent-0.20.0.jar=7071:/opt/kafka/jmx_javaagent/kafka-2_0_0.yml"
     volumes:
-      - ./jmx_exporter:/opt/kafka/jmx_javaagent
+      - ./kafka/jmx_exporter:/opt/kafka/jmx_javaagent
     ports:
       - "9191:9191"
       - "9091:9091"
@@ -52,8 +52,12 @@ services:
   init-kafka-container:
     image: confluentinc/cp-kafka:7.0.9
     container_name: init-kafka-container
+    volumes:
+      - ./connect/postgres-connector.json:/connect/postgres-connector.json
     depends_on:
       kafka:
+        condition: service_healthy
+      connect:
         condition: service_healthy
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
@@ -67,25 +71,35 @@ services:
       kafka-topics --create --topic processor-topic --partitions 1 --bootstrap-server kafka:9191
       kafka-topics --create --topic postgres-topic --partitions 1 --bootstrap-server kafka:9191
       kafka-topics --create --topic clickhouse-topic --partitions 1 --bootstrap-server kafka:9191
+      
+      # create kafka connectors
+      curl -vvv --location --request POST 'http://connect:8083/connectors' \
+        --header 'Content-Type: application/json' \
+        --data-binary '@/connect/postgres-connector.json'       
       "
 
   connect:
     image: confluentinc/cp-kafka-connect:7.0.9
     container_name: connect
     hostname: connect
+    healthcheck:
+      test: "curl --fail http://localhost:8083 || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 300
     depends_on:
       kafka:
         condition: service_healthy
     ports:
-      - "8085:8085"
+      - "8085:8083"
     environment:
       CONNECT_BOOTSTRAP_SERVERS: "kafka:9191"
       CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
-      CONNECT_REST_PORT: "8085"
+      CONNECT_REST_PORT: "8083"
       CONNECT_GROUP_ID: "local-connect"
-      CONNECT_CONFIG_STORAGE_TOPIC: "local-connect-config"
-      CONNECT_OFFSET_STORAGE_TOPIC: "local-connect-offsets"
-      CONNECT_STATUS_STORAGE_TOPIC: "local-connect-status"
+      CONNECT_CONFIG_STORAGE_TOPIC: "kafka-connect-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "kafka-connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "kafka-connect-status"
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
@@ -98,6 +112,58 @@ services:
     volumes:
       - ./connect:/etc/kafka-connect/jars
 
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.29.0
+    container_name: ksqldb-server
+    hostname: ksqldb-server
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail http://0.0.0.0:8088 || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 300
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: "kafka:9191"
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      KSQL_KSQL_CONNECT_URL: http://connect:8083
+
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.29.0
+    container_name: ksqldb-cli
+    hostname: ksqldb-cli
+    depends_on:
+      kafka:
+        condition: service_healthy
+      ksqldb-server:
+        condition: service_healthy
+#      init-kafka-container:
+#        condition: service_completed_successfully
+    volumes:
+      - ./ksqldb/script.sql:/data/script.sql
+#    entrypoint: /bin/sh
+#    tty: true
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        sleep 15
+        echo -e "\n\n⏳ Waiting for ksqlDB to be available before launching CLI\n"
+        while [ $$(curl -s -o /dev/null -w %{http_code} http://ksqldb-server:8088/) -eq 000 ]
+        do 
+          echo -e $$(date) "ksqlDB Server HTTP state: " $$(curl -s -o /dev/null -w %{http_code} http://ksqldb-server:8088/) " (waiting for 200)"
+          sleep 5
+        done
+        echo -e "\n\n-> Running SQL commands\n"
+        cat /data/script.sql <(echo -e '\nEXIT')| ksql http://ksqldb-server:8088
+        echo -e "\n\n-> Sleeping…\n"
+        sleep infinity  
+
   kafka-exporter:
     image: bitnami/kafka-exporter:1.7.0
     container_name: kafka-exporter
@@ -109,18 +175,6 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: kafdrop
-    hostname: kafdrop
-    restart: "no"
-    ports:
-      - "9000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:9191"
-    depends_on:
-      - "kafka"
 
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -216,6 +270,23 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: clickhouse
+    hostname: clickhouse
+    depends_on:
+      kafka:
+        condition: service_healthy
+      connect:
+        condition: service_healthy
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./clickhouse/clickhouse.sql:/docker-entrypoint-initdb.d/init.sql
 
   yandex-tank:
     build: ./yandex-tank

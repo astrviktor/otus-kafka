@@ -1,11 +1,14 @@
 package converter
 
 import (
+	"bytes"
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/VictoriaMetrics/metrics"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/jszwec/csvutil"
 	"go.uber.org/zap"
 	"project/internal/config"
 	"project/internal/model"
@@ -145,7 +148,7 @@ func (w *Worker) processing() (string, string) {
 	}
 
 	err = w.producerPostgres.Produce(&kafka.Message{
-		Key: []byte(jobDone.Id),
+		//Key: []byte(jobDone.Id),
 		TopicPartition: kafka.TopicPartition{
 			Topic:     &w.cfg.Kafka.ConverterPostgresProducer.Topic,
 			Partition: kafka.PartitionAny},
@@ -160,14 +163,14 @@ func (w *Worker) processing() (string, string) {
 	// to clickhouse
 	w.log.Info("jobDone to clickhouse message")
 
-	valueClickhouse, err := w.JobDoneToPostgresMessage(jobDone)
+	valueClickhouse, err := w.JobDoneToClickhouseMessage(jobDone)
 	if err != nil {
 		w.log.Error("fail to convert to clickhouse message", zap.Error(err))
 		return resultEmpty, statusError
 	}
 
 	err = w.producerClickhouse.Produce(&kafka.Message{
-		Key: []byte(jobDone.Id),
+		//Key: []byte(jobDone.Id),
 		TopicPartition: kafka.TopicPartition{
 			Topic:     &w.cfg.Kafka.ConverterClickhouseProducer.Topic,
 			Partition: kafka.PartitionAny},
@@ -204,23 +207,46 @@ func (w *Worker) Stop() {
 }
 
 func (w *Worker) JobDoneToPostgresMessage(jobDone model.JobDone) ([]byte, error) {
-	msg := model.PostgresMessage{
+	msg := model.PostgresMessage{}
+	msg.Init()
+
+	msg.Payload = model.PostgresPayload{
 		Id:         jobDone.Id,
-		Status:     jobDone.Status,
-		DateCreate: jobDone.DateCreate,
-		DateDone:   jobDone.DateDone,
+		Status:     string(jobDone.Status),
+		CreateDate: jobDone.CreateDate.Unix(),
+		FinishDate: jobDone.FinishDate.Unix(),
 	}
 
 	return json.Marshal(msg)
 }
 
 func (w *Worker) JobDoneToClickhouseMessage(jobDone model.JobDone) ([]byte, error) {
-	msg := model.PostgresMessage{
+	createMsg := model.ClickhouseMessage{
 		Id:         jobDone.Id,
-		Status:     jobDone.Status,
-		DateCreate: jobDone.DateCreate,
-		DateDone:   jobDone.DateDone,
+		Status:     model.JobStatusCreate,
+		CreateDate: jobDone.CreateDate,
 	}
 
-	return json.Marshal(msg)
+	finishMsg := model.ClickhouseMessage{
+		Id:         jobDone.Id,
+		Status:     model.JobStatusFinish,
+		CreateDate: jobDone.FinishDate,
+	}
+
+	var buffer bytes.Buffer
+	writer := csv.NewWriter(&buffer)
+	encoder := csvutil.NewEncoder(writer)
+	encoder.AutoHeader = false
+
+	if err := encoder.Encode(createMsg); err != nil {
+		return nil, err
+	}
+
+	if err := encoder.Encode(finishMsg); err != nil {
+		return nil, err
+	}
+
+	writer.Flush()
+
+	return buffer.Bytes(), nil
 }

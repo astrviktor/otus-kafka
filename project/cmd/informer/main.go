@@ -8,16 +8,16 @@ import (
 	"os"
 	"os/signal"
 	"project/internal/config"
+	"project/internal/informer"
 	"project/internal/logger"
 	"project/internal/metrics"
 	"project/internal/middleware"
-	"project/internal/receiver"
 	"syscall"
 )
 
 func main() {
 	if len(os.Args) > 1 {
-		config.PrintUsage(config.ReceiverPrefix)
+		config.PrintUsage(config.InformerPrefix)
 		return
 	}
 
@@ -26,9 +26,9 @@ func main() {
 		fmt.Println("fail to create logger")
 		os.Exit(1)
 	}
-	log = log.Named(config.ReceiverPrefix)
+	log = log.Named(config.InformerPrefix)
 
-	cfg, err := config.ReadConfig(config.ReceiverPrefix)
+	cfg, err := config.ReadConfig(config.InformerPrefix)
 	if err != nil {
 		log.Error("fail to read config", zap.Error(err))
 		os.Exit(1)
@@ -39,7 +39,7 @@ func main() {
 		os.Exit(1)
 	}()
 
-	h, err := receiver.NewHandler(log, cfg)
+	h, err := informer.NewHandler(log, cfg)
 	if err != nil {
 		log.Error("fail to create handler", zap.Error(err))
 		os.Exit(1)
@@ -48,7 +48,7 @@ func main() {
 	h.Run()
 
 	r := router.New()
-	r.POST("/api/v1/create/job", middleware.Middleware(log, h.CreateJob))
+	r.GET("/info/{id}", middleware.Middleware(log, h.GetInfo))
 	r.GET("/metrics", metrics.Metrics())
 
 	server := fasthttp.Server{
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	go func() {
-		addr := fmt.Sprintf("%s:%s", cfg.Receiver.Host, cfg.Receiver.Port)
+		addr := fmt.Sprintf("%s:%s", cfg.Informer.Host, cfg.Informer.Port)
 
 		log.Info("start server", zap.String("server addr", addr))
 		err = server.ListenAndServe(addr)

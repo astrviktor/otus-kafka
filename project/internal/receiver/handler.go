@@ -32,7 +32,7 @@ func NewHandler(log *zap.Logger, cfg *config.Config) (*Handler, error) {
 	}
 
 	h := &Handler{
-		log: log.Named("handler"),
+		log: log,
 		cfg: cfg,
 
 		producer: producer,
@@ -51,7 +51,7 @@ func randomString(n int) string {
 func (h *Handler) CreateJob(ctx *fasthttp.RequestCtx) {
 	job := model.Job{
 		Id:         uuid.New().String(),
-		DateCreate: time.Now(),
+		CreateDate: time.Now(),
 		Sleep:      int64(rand.Intn(h.cfg.Receiver.MaxSleep-h.cfg.Receiver.MinSleep) + h.cfg.Receiver.MinSleep),
 		Data:       randomString(h.cfg.Receiver.DataSize),
 	}
@@ -79,7 +79,7 @@ func (h *Handler) CreateJob(ctx *fasthttp.RequestCtx) {
 
 	jobResponse := model.JobResponse{
 		Id:         job.Id,
-		DateCreate: job.DateCreate,
+		CreateDate: job.CreateDate,
 		Sleep:      job.Sleep,
 		DataSize:   len(job.Data),
 	}

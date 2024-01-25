@@ -9,11 +9,13 @@ import (
 const ReceiverPrefix = "receiver"
 const ProcessorPrefix = "processor"
 const ConverterPrefix = "converter"
+const InformerPrefix = "informer"
 
 type Config struct {
 	Receiver  ReceiverConfig
 	Processor ProcessorConfig
 	Converter ConverterConfig
+	Informer  InformerConfig
 	Logger    LoggerConfig
 	Kafka     KafkaConfig
 }
@@ -36,6 +38,15 @@ type ProcessorConfig struct {
 type ConverterConfig struct {
 	Host string `default:"127.0.0.1"`
 	Port string `default:"8083"`
+}
+
+type InformerConfig struct {
+	Host string `default:"127.0.0.1"`
+	Port string `default:"8084"`
+
+	RequestHost string `default:"127.0.0.1"`
+	RequestPort string `default:"8088"`
+	RequestPath string `default:"query"`
 }
 
 type LoggerConfig struct {
