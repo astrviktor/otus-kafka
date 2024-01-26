@@ -225,13 +225,13 @@ services:
     container_name: receiver
     hostname: receiver
     ports:
-      - "8081:8081"
+      - "8001:8001"
     environment:
       RECEIVER_KAFKA_BOOTSTRAPSERVERS: "kafka:9191"
       RECEIVER_RECEIVER_HOST: "0.0.0.0"
-      RECEIVER_RECEIVER_PORT: "8081"
+      RECEIVER_RECEIVER_PORT: "8001"
     depends_on:
-      kafka:
+      connect:
         condition: service_healthy
 
   processor:
@@ -239,13 +239,13 @@ services:
     container_name: processor
     hostname: processor
     ports:
-      - "8082:8082"
+      - "8002:8002"
     environment:
       PROCESSOR_KAFKA_BOOTSTRAPSERVERS: "kafka:9191"
       PROCESSOR_PROCESSOR_HOST: "0.0.0.0"
-      PROCESSOR_PROCESSOR_PORT: "8082"
+      PROCESSOR_PROCESSOR_PORT: "8002"
     depends_on:
-      kafka:
+      connect:
         condition: service_healthy
 
   converter:
@@ -253,13 +253,28 @@ services:
     container_name: converter
     hostname: converter
     ports:
-      - "8083:8083"
+      - "8003:8003"
     environment:
       CONVERTER_KAFKA_BOOTSTRAPSERVERS: "kafka:9191"
-      CONVERTER_PROCESSOR_HOST: "0.0.0.0"
-      CONVERTER_PROCESSOR_PORT: "8083"
+      CONVERTER_CONVERTER_HOST: "0.0.0.0"
+      CONVERTER_CONVERTER_PORT: "8003"
     depends_on:
-      kafka:
+      connect:
+        condition: service_healthy
+
+  informer:
+    image: astrviktor/informer:1.0.0
+    container_name: informer
+    hostname: informer
+    ports:
+      - "8004:8004"
+    environment:
+      INFORMER_INFORMER_HOST: "0.0.0.0"
+      INFORMER_INFORMER_PORT: "8004"
+      INFORMER_INFORMER_REQUESTHOST: "ksqldb-server"
+      INFORMER_INFORMER_REQUESTPOST: "8088"
+    depends_on:
+      connect:
         condition: service_healthy
 
   postgres:

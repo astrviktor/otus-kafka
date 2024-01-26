@@ -73,10 +73,6 @@ func (h *Handler) GetInfo(ctx *fasthttp.RequestCtx) {
 	}
 
 	var ksqlResponse [3]interface{}
-	//ksqlResponse[0] = model.KsqlHeader{}
-	//ksqlResponse[1] = model.KsqlRow{}
-	//ksqlResponse[2] = model.KsqlFinalMessage{}
-
 	err = json.Unmarshal(resp.Body(), &ksqlResponse)
 	if err != nil {
 		h.log.Error("fail to unmarshal data", zap.Error(err))
@@ -84,7 +80,34 @@ func (h *Handler) GetInfo(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	body, err := json.Marshal(ksqlResponse[1])
+	responseData, err := json.Marshal(ksqlResponse[1])
+	if err != nil {
+		h.log.Error("fail to marshal response data", zap.Error(err))
+		ctx.Error("fail to marshal response data", http.StatusInternalServerError)
+		return
+	}
+
+	informerResponse := model.InformerResponse{
+		Id:     id,
+		Status: string(model.JobStatusUnknown),
+	}
+
+	var response model.KsqlRow
+	err = json.Unmarshal(responseData, &response)
+	if err != nil {
+		h.log.Error("fail to unmarshal data", zap.Error(err))
+		ctx.Error("fail to unmarshal data", http.StatusInternalServerError)
+		return
+	}
+
+	if len(response.Row.Columns) == 4 {
+		informerResponse.Id = response.Row.Columns[0]
+		informerResponse.Status = response.Row.Columns[1]
+		informerResponse.CreateDate = response.Row.Columns[2]
+		informerResponse.FinishDate = response.Row.Columns[3]
+	}
+
+	body, err := json.Marshal(informerResponse)
 	if err != nil {
 		h.log.Error("fail to marshal response data", zap.Error(err))
 		ctx.Error("fail to marshal response data", http.StatusInternalServerError)
@@ -94,8 +117,6 @@ func (h *Handler) GetInfo(ctx *fasthttp.RequestCtx) {
 	ctx.Success("application/json", body)
 }
 
-func (h *Handler) Run() {
-
-}
+func (h *Handler) Run() {}
 
 func (h *Handler) Stop() {}

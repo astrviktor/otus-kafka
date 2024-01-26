@@ -30,3 +30,10 @@ type Row struct {
 type KsqlFinalMessage struct {
 	FinalMessage string `json:"finalMessage"`
 }
+
+type InformerResponse struct {
+	Id         string `json:"id"`
+	Status     string `json:"status"`
+	CreateDate string `json:"create_date,omitempty"`
+	FinishDate string `json:"finish_date,omitempty"`
+}

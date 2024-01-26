@@ -115,7 +115,7 @@ func (w *Worker) middleware(handle FuncHandlerError) FuncHandler {
 		}
 
 		duration := time.Since(now)
-		metrics.GetOrCreateHistogram(fmt.Sprintf("processor_duration{result=%q, status=%q}", result, status)).Update(duration.Seconds())
+		metrics.GetOrCreateHistogram(fmt.Sprintf("kafka_duration{result=%q, status=%q}", result, status)).Update(duration.Seconds())
 	}
 }
 

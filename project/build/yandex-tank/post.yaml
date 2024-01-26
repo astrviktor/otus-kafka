@@ -1,14 +1,14 @@
 phantom:
   enabled: true
   #  package: yandextank.plugins.Phantom
-  address: 127.0.0.1:8081
+  address: 127.0.0.1:8001
   timeout: 60s
   ammofile: /var/loadtest/ammo.txt
   ammo_type: uripost
   #  writelog: 0
   load_profile:
     load_type: rps
-    schedule: line(100, 1000, 1m)
+    schedule: line(50, 100, 1m)
 #    schedule: const(10, 1m)
 #  header_http: "1.1"
 #  uris:

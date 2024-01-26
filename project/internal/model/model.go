@@ -19,8 +19,9 @@ type JobResponse struct {
 type JobStatus string
 
 const (
-	JobStatusCreate JobStatus = "create"
-	JobStatusFinish JobStatus = "finish"
+	JobStatusCreate  JobStatus = "create"
+	JobStatusFinish  JobStatus = "finish"
+	JobStatusUnknown JobStatus = "unknown"
 )
 
 type JobDone struct {
