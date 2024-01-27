@@ -73,9 +73,7 @@ services:
       kafka-topics --create --topic clickhouse-topic --partitions 1 --bootstrap-server kafka:9191
       
       # create kafka connectors
-      curl -vvv --location --request POST 'http://connect:8083/connectors' \
-        --header 'Content-Type: application/json' \
-        --data-binary '@/connect/postgres-connector.json'
+      curl --request POST 'http://connect:8083/connectors' --header 'Content-Type: application/json' --data-binary '@/connect/postgres-connector.json'
       
       exit 0
       "
@@ -93,7 +91,7 @@ services:
       kafka:
         condition: service_healthy
     ports:
-      - "8085:8083"
+      - "8083:8083"
     environment:
       CONNECT_BOOTSTRAP_SERVERS: "kafka:9191"
       CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"

@@ -28,5 +28,11 @@ docker-build-informer:
 		-t "astrviktor/informer:1.0.0" \
 		-f ./build/informer/Dockerfile .
 
+docker-push:
+	docker push astrviktor/receiver:1.0.0
+	docker push astrviktor/processor:1.0.0
+	docker push astrviktor/converter:1.0.0
+	docker push astrviktor/informer:1.0.0
+
 yandex-tank:
 	docker exec -it yandex-tank /bin/bash
