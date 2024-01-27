@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -614,9 +614,9 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(kafka_duration_count{job=\"processor\"}[1m])) by (result, status) ",
+          "expr": "sum(rate(kafka_duration_count{job=~\"processor.*\"}[1m])) by (job, result, status) ",
           "interval": "",
-          "legendFormat": "{{result}} {{status}}",
+          "legendFormat": "{{job}}: {{result}} {{status}}",
           "queryType": "randomWalk",
           "range": true,
           "refId": "A"
@@ -682,7 +682,32 @@
           },
           "unit": "bytes"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "build-processor-2:8002 "
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -711,7 +736,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "go_memstats_alloc_bytes{job=\"processor\"}",
+          "expr": "go_memstats_alloc_bytes{job=~\"processor.*\"}",
           "interval": "",
           "legendFormat": "{{instance}} {{pod_name}}",
           "queryType": "randomWalk",
@@ -806,7 +831,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "go_goroutines{job=\"processor\"}",
+          "expr": "go_goroutines{job=~\"processor.*\"}",
           "interval": "",
           "legendFormat": "{{instance}} {{pod_name}}",
           "queryType": "randomWalk",
@@ -903,7 +928,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "process_resident_memory_bytes{job=\"processor\"}",
+          "expr": "process_resident_memory_bytes{job=~\"processor.*\"}",
           "interval": "",
           "legendFormat": "{{instance}} {{pod_name}}",
           "queryType": "randomWalk",
@@ -995,7 +1020,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "rate(process_cpu_seconds_total{job=\"processor\"}[1m])",
+          "expr": "rate(process_cpu_seconds_total{job=~\"processor.*\"}[1m])",
           "interval": "",
           "legendFormat": "{{instance}} {{pod_name}}",
           "queryType": "randomWalk",
@@ -2020,6 +2045,7 @@
       "type": "timeseries"
     }
   ],
+  "refresh": "5s",
   "schemaVersion": 37,
   "style": "dark",
   "tags": [],
@@ -2034,6 +2060,6 @@
   "timezone": "",
   "title": "Services",
   "uid": "w_YseGpIk",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }

@@ -7,9 +7,18 @@ scrape_configs:
   - job_name: receiver
     static_configs:
       - targets: ['receiver:8001']
-  - job_name: processor
+  - job_name: processor-1
     static_configs:
-      - targets: ['processor:8002']
+      - targets: ['build-processor-1:8002']
+  - job_name: processor-2
+    static_configs:
+      - targets: ['build-processor-2:8002']
+  - job_name: processor-3
+    static_configs:
+      - targets: ['build-processor-3:8002']
+  - job_name: processor-4
+    static_configs:
+      - targets: ['build-processor-4:8002']
   - job_name: converter
     static_configs:
       - targets: ['converter:8003']

@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.8'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.9
@@ -49,9 +49,9 @@ services:
       - "9091:9091"
       - "7071:7071"
 
-  init-kafka-container:
+  kafka-init-container:
     image: confluentinc/cp-kafka:7.0.9
-    container_name: init-kafka-container
+    container_name: kafka-init-container
     volumes:
       - ./connect/postgres-connector.json:/connect/postgres-connector.json
     depends_on:
@@ -75,7 +75,9 @@ services:
       # create kafka connectors
       curl -vvv --location --request POST 'http://connect:8083/connectors' \
         --header 'Content-Type: application/json' \
-        --data-binary '@/connect/postgres-connector.json'       
+        --data-binary '@/connect/postgres-connector.json'
+      
+      exit 0
       "
 
   connect:
@@ -142,8 +144,8 @@ services:
         condition: service_healthy
       ksqldb-server:
         condition: service_healthy
-#      init-kafka-container:
-#        condition: service_completed_successfully
+      kafka-init-container:
+        condition: service_completed_successfully
     volumes:
       - ./ksqldb/script.sql:/data/script.sql
 #    entrypoint: /bin/sh
@@ -230,23 +232,29 @@ services:
       RECEIVER_KAFKA_BOOTSTRAPSERVERS: "kafka:9191"
       RECEIVER_RECEIVER_HOST: "0.0.0.0"
       RECEIVER_RECEIVER_PORT: "8001"
+      RECEIVER_RECEIVER_MINSLEEP: "99"
+      RECEIVER_RECEIVER_MAXSLEEP: "100"
     depends_on:
-      connect:
-        condition: service_healthy
+      kafka-init-container:
+        condition: service_completed_successfully
 
   processor:
     image: astrviktor/processor:1.0.0
-    container_name: processor
+#    container_name: processor
     hostname: processor
-    ports:
-      - "8002:8002"
+#    ports:
+#      - "8002:8002"
     environment:
       PROCESSOR_KAFKA_BOOTSTRAPSERVERS: "kafka:9191"
       PROCESSOR_PROCESSOR_HOST: "0.0.0.0"
       PROCESSOR_PROCESSOR_PORT: "8002"
     depends_on:
-      connect:
-        condition: service_healthy
+      kafka-init-container:
+        condition: service_completed_successfully
+    deploy:
+      mode: replicated
+      replicas: 2
+      endpoint_mode: dnsrr
 
   converter:
     image: astrviktor/converter:1.0.0
@@ -259,8 +267,8 @@ services:
       CONVERTER_CONVERTER_HOST: "0.0.0.0"
       CONVERTER_CONVERTER_PORT: "8003"
     depends_on:
-      connect:
-        condition: service_healthy
+      kafka-init-container:
+        condition: service_completed_successfully
 
   informer:
     image: astrviktor/informer:1.0.0
@@ -274,8 +282,8 @@ services:
       INFORMER_INFORMER_REQUESTHOST: "ksqldb-server"
       INFORMER_INFORMER_REQUESTPOST: "8088"
     depends_on:
-      connect:
-        condition: service_healthy
+      kafka-init-container:
+        condition: service_completed_successfully
 
   postgres:
     image: postgres:16.1
@@ -297,6 +305,8 @@ services:
         condition: service_healthy
       connect:
         condition: service_healthy
+      kafka-init-container:
+        condition: service_completed_successfully
     ports:
       - "8123:8123"
       - "9000:9000"
