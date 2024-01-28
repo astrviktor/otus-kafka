@@ -18,7 +18,7 @@
 Сервис получает запрос через REST
 
 ```
-curl --request POST 'http://127.0.0.1:8001/api/v1/create/job'
+curl --request POST 'http://127.0.0.1:8001/create/job'
 
 {"id":"b31b7446-20f7-4add-adea-157bac7fe73b","create_date":"2024-01-27T12:34:50.594423357Z","sleep":99,"data_size":1024}
 ```
@@ -408,7 +408,7 @@ make compose-down
 
 ## Проверка
 
-Нагрузка на POST /api/v1/create/job создается через yandex-tank
+Нагрузка на POST /create/job создается через yandex-tank
 
 Запускается нагрузка 25 RPS на 300 секунд
 ```

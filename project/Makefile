@@ -36,3 +36,9 @@ docker-push:
 
 yandex-tank:
 	docker exec -it yandex-tank /bin/bash
+
+postgres:
+	docker exec -ti postgres psql -U postgres
+
+clickhouse:
+	docker exec -ti clickhouse clickhouse-client
